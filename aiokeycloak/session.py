@@ -17,7 +17,6 @@ class AiohttpSession:
     async def close(self) -> None:
         if self._session is None or self._session.closed:
             return None
-
         await self._session.close()
 
     async def __aenter__(self) -> Self:
@@ -30,7 +29,9 @@ class AiohttpSession:
     async def send_request(self, method: str, url: Any, **kwargs: Any) -> Dict[Any, Any]:
         session = await self._create_session()
         try:
-            async with session.request(method, url, **kwargs) as response:
+            async with session.request(
+                method, url, timeout=aiohttp.ClientTimeout(total=60), **kwargs
+            ) as response:
                 if response.status > HTTP_226_IM_USED:
                     try:
                         message = (await response.json())["message"]
@@ -55,5 +56,6 @@ class AiohttpSession:
             raise KeycloakError(f"{type(e).__name__}: {e}")
 
     async def _create_session(self) -> aiohttp.ClientSession:
-        self._session = aiohttp.ClientSession(base_url=self._base_url)
+        if self._session is None or self._session.closed:
+            self._session = aiohttp.ClientSession(base_url=self._base_url)
         return self._session

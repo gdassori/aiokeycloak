@@ -5,7 +5,7 @@ description = ""
 authors = ["GLEF1X <glebgar567@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.7,<3.11"
+python = ">=3.7,<3.12"
 aiohttp = "^3.8.1"
 python-jose = "^3.3.0"
 
